@@ -48,11 +48,9 @@
 - `libs/external/glfw/include` + `libs/external/glfw/lib-vc2022/*.lib`
 - `libs/external/glew/include` + `libs/external/glew/lib/*.lib`
 - `libs/external/glm/`（header-only）
-- `libs/external/tinyobj/`（header-only 或按你现有结构）
+- `libs/external/tinyobj/`（header-only）
 - `libs/stb/stb_image/`
 - `libs/external/assimp/include` + `libs/external/assimp/lib/*.lib` + `libs/external/assimp/bin/*.dll`
-
-由于你的 `.gitignore` 忽略了 `/libs/`，所以这些内容不会随仓库提交。
 
 ---
 
