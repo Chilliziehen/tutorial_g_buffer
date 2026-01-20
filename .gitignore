@@ -1,0 +1,10 @@
+/libs/
+/thirdparty/
+/src/cxx_main/config/
+/src/cxx_lib/config/
+/cmake-build-release-visual-studio/
+/cmake-build-debug-visual-studio/
+/cmake-build-debug/
+/cmake-build-release/
+/resources/
+/resources/example1/

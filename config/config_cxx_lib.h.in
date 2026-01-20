@@ -1,0 +1,3 @@
+#define LOGS_DIR "@LOGS_DIR@"
+#define LOG_FILENAME "@LOG_FILENAME@"
+#define BUFFERED_LOGS false
