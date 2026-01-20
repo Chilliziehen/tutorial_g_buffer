@@ -5,8 +5,6 @@
 - `tutorial_g_buffer`：G-Buffer / Deferred 相关示例
 - `cxx_library`：场景/资源导入（Assimp）等通用库
 
-> 本文档严格遵循当前仓库的工程结构与 CMake 约定（包含 `configure_file()` 生成 `config.h` 的方式），不会引入你工程里没有的“自定义资源路径写死”的改法。
-
 ---
 
 ## 1. 目录结构（和你需要关心的部分）
