@@ -388,7 +388,7 @@ int main() {
         }
 
         pointLight pl;
-        pl.position = glm::vec3(0.0f, 5.0f, 5.0f);
+        pl.position = glm::vec3(-5.0f, 2.0f, -5.0f);
         pl.color = glm::vec3(1.0f, 1.0f, 1.0f);
         pl.constant = 1.0f;
         pl.linear = 0.09f;
@@ -443,12 +443,17 @@ int main() {
                     glBindVertexArray(0);
                 }
             }
-            //首先映射material
+            // 首先映射material
             lightingProgram.use();
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glViewport(0, 0, viewW, viewH);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glDisable(GL_DEPTH_TEST);
+
+            // Per-frame uniforms for lighting
+            Utilities::setVec3(lightingProgram.getId(), "uViewPos", cam->cameraPos);
+            Utilities::setInt(lightingProgram.getId(), "uDebugMode", g_debugMode);
+
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, gPosition);
             Utilities::setInt(lightingProgram.getId(), "gPosition", 0);
