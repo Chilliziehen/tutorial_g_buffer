@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 4.0)
 project(tutorial_g_buffer)
+
+# 放在 Root CMakeLists.txt 的最前面
+if (MSVC)
+    set(ENV{VSLANG} 1033)
+    add_compile_options(/utf-8)
+endif()
+
 message("C_COMPILER: ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_LINKER = ${CMAKE_LINKER}")
 

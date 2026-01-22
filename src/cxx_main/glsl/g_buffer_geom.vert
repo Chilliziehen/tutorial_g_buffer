@@ -21,7 +21,6 @@ void main() {
     vs_out.FragPos = worldPos.xyz;
     vs_out.Normal = mat3(transpose(inverse(uModel))) * aNormal;
     vs_out.TexCoord = aTexCoord;
-
     gl_Position = uProj * uView * worldPos;
 }
 

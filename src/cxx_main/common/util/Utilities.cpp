@@ -8,6 +8,8 @@
 #include <stb_image.h>
 #include <stdexcept>
 #include <string>
+#include <GL/glew.h>
+#include <gtc/type_ptr.hpp>
 
 namespace Utilities {
     const char* rdFile(const char* filePath) {
@@ -31,28 +33,8 @@ namespace Utilities {
         file.close();
         return buf;
     }
-    static inline void setInt(GLuint programId, const char* name, int v) {
-        const GLint loc = glGetUniformLocation(programId, name);
-        if (loc != -1) glUniform1i(loc, v);
-    }
-    static inline void setFloat(GLuint programId, const char* name, float v) {
-        const GLint loc = glGetUniformLocation(programId, name);
-        if (loc != -1) glUniform1f(loc, v);
-    }
-    static inline void setVec3(GLuint programId, const char* name, const glm::vec3& v) {
-        const GLint loc = glGetUniformLocation(programId, name);
-        if (loc != -1) glUniform3fv(loc, 1, glm::value_ptr(v));
-    }
-    static inline void setVec4(GLuint programId, const char* name, const glm::vec4& v) {
-        const GLint loc = glGetUniformLocation(programId, name);
-        if (loc != -1) glUniform4fv(loc, 1, glm::value_ptr(v));
-    }
-    static inline void setMat4(GLuint programId, const char* name, const glm::mat4& m) {
-        const GLint loc = glGetUniformLocation(programId, name);
-        if (loc != -1) glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
-    }
 
-    static GLuint createTexture2DFromFile(const std::string& path) {
+    uint32_t createTexture2DFromFile(const std::string& path) {
         int w = 0, h = 0, n = 0;
         stbi_set_flip_vertically_on_load(true);
         unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
@@ -66,7 +48,7 @@ namespace Utilities {
         else if (n == 3) { format = GL_RGB; internalFormat = GL_SRGB8; }
         else if (n == 4) { format = GL_RGBA; internalFormat = GL_SRGB8_ALPHA8; }
 
-        GLuint tex = 0;
+        uint32_t tex = 0;
         glGenTextures(1, &tex);
         glBindTexture(GL_TEXTURE_2D, tex);
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, format, GL_UNSIGNED_BYTE, data);
@@ -81,9 +63,36 @@ namespace Utilities {
         stbi_image_free(data);
         return tex;
     }
-    static void drainGlErrors(const char* tag) {
+    void drainGlErrors(const char* tag) {
         for (GLenum e = glGetError(); e != GL_NO_ERROR; e = glGetError()) {
             std::cerr << "[GL_ERROR] " << tag << " : 0x" << std::hex << e << std::dec << std::endl;
         }
     }
+    void calculateGlobalTransforms(scene::RenderScene *rs) {
+        typedef std::pair<scene::Node*, glm::mat4> NodeTransformPair;
+        auto genTransform = [](const scene::Transform& t){
+            return glm::translate(glm::mat4(1.0f), t.position) *
+                   glm::mat4_cast(t.rotation) *
+                   glm::scale(glm::mat4(1.0f), t.scale);
+        };
+        glm::mat4 rootTransform = genTransform(rs->nodes[rs->rootIndex].localTransform);
+        std::vector<NodeTransformPair> stack;
+        stack.emplace_back(&rs->nodes[rs->rootIndex], rootTransform);
+        while (!stack.empty()) {
+            NodeTransformPair current = stack.back();
+            stack.pop_back();
+            scene::Node* node = current.first;
+            glm::mat4 globalTransform = current.second;
+            node->globalTransform = globalTransform;
+            for (int childIndex : node->children) {
+                if (childIndex >= 0 && static_cast<size_t>(childIndex) < rs->nodes.size()) {
+                    scene::Node* childNode = &rs->nodes[childIndex];
+                    glm::mat4 childLocalTransform = genTransform(childNode->localTransform);
+                    glm::mat4 childGlobalTransform = globalTransform * childLocalTransform;
+                    stack.emplace_back(childNode, childGlobalTransform);
+                }
+            }
+        }
+    }
+
 }

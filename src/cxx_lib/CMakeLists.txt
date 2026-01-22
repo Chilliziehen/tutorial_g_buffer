@@ -45,6 +45,11 @@ add_library(cxx_library
         resources/IndexPoolAccessor.cpp
         resources/IndexPoolAccessor.h
 
+        scene/SceneRenderer_GL.h
+        scene/SceneRenderer_GL.cpp
+        scene/SceneRenderer_GL.cpp
+        scene/SceneRenderer_GL.cpp
+
 )
 
 target_include_directories(cxx_library PRIVATE

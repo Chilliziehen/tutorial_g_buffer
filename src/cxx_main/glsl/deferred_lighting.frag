@@ -4,13 +4,36 @@ out vec4 FragColor;
 
 in vec2 vUV;
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gAlbedoSpec;
+uniform sampler2D gPosition;        //texture 0
+uniform sampler2D gNormal;          //texture 1
+uniform sampler2D gUV;              //texture 2
+uniform isampler2D gMaterialIndex;  //texture 3
+uniform isampler2D gTexIndices0;    //texture 4
 
 uniform vec3 uViewPos;
 
-struct Light {
+struct Material{
+    vec4 baseColorFactor;
+    float metallicFactor;
+    float roughnessFactor;
+    int doubleSided;
+    int albedoTexture;
+    int normalTexture;
+    int metallicRoughnessTexture;
+    int aoTexture;
+    int emissiveTexture;
+};
+
+//uniform int numLights;
+//uniform Light lights[16];
+
+uniform int uMaterialCount;
+uniform Material uMaterials[32];
+
+uniform int uTextureCount;
+uniform sampler2D uTextures[32];
+
+struct PointLight{
     vec3 position;
     vec3 color;
     float constant;
@@ -18,55 +41,30 @@ struct Light {
     float quadratic;
 };
 
-uniform int numLights;
-uniform Light lights[16];
-
-// 0=lit, 1=pos, 2=normal, 3=albedo
-uniform int uDebugMode;
+uniform PointLight uPointLight;
 
 void main() {
-    vec2 uv = clamp(vUV, vec2(0.0), vec2(1.0));
-
-    vec3 FragPos = texture(gPosition, uv).xyz;
-    vec3 Normal  = normalize(texture(gNormal, uv).xyz);
-    vec4 AlbedoSpec = texture(gAlbedoSpec, uv);
-    vec3 Albedo = AlbedoSpec.rgb;
-    float SpecularStrength = AlbedoSpec.a;
-
-    if (uDebugMode == 1) {
-        // visualize position (compressed to 0..1 range)
-        FragColor = vec4(FragPos * 0.1 + 0.5, 1.0);
+    vec3 FragPos = texture(gPosition, vUV).xyz;
+    vec3 Normal = normalize(texture(gNormal, vUV).xyz);
+    vec2 uv = texture(gUV, vUV).xy;
+    int materialIndex = texture(gMaterialIndex, vUV).r;
+    if(FragPos.x == 0.0f && FragPos.y == 0.0f && FragPos.z == 0.0f){
+        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
-    if (uDebugMode == 2) {
-        FragColor = vec4(Normal * 0.5 + 0.5, 1.0);
+    Material material = uMaterials[materialIndex];
+    if(material.albedoTexture>=0){
+        int albedoTexIndex = material.albedoTexture;
+        vec4 albedoTex = texture(uTextures[albedoTexIndex], uv);
+        FragColor = albedoTex;
         return;
     }
-    if (uDebugMode == 3) {
-        FragColor = vec4(Albedo, 1.0);
+    if (FragPos.x ==0.0f && FragPos.y ==0.0f && FragPos.z ==0.0f) {
+        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
-    vec3 lighting = 0.05 * Albedo; // ambient
-
-    vec3 V = normalize(uViewPos - FragPos);
-
-    for (int i = 0; i < numLights; ++i) {
-        vec3 Lvec = lights[i].position - FragPos;
-        float dist = length(Lvec);
-        vec3 L = Lvec / max(dist, 1e-6);
-
-        float attenuation = 1.0 / (lights[i].constant + lights[i].linear * dist + lights[i].quadratic * dist * dist);
-
-        float NdotL = max(dot(Normal, L), 0.0);
-        vec3 diffuse = NdotL * Albedo * lights[i].color;
-
-        vec3 H = normalize(L + V);
-        float spec = pow(max(dot(Normal, H), 0.0), 32.0);
-        vec3 specular = spec * SpecularStrength * lights[i].color;
-
-        lighting += (diffuse + specular) * attenuation;
-    }
-
-    FragColor = vec4(lighting, 1.0);
+    //Material material = uMaterials[materialIndex];
+    FragColor = vec4(vUV,0.0f,1.0f);
+    //FragColor = texture(material.albedoTexture, uv);
 }

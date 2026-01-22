@@ -11,6 +11,12 @@
 #include <GLFW/glfw3.h>
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
+
+// Mouse deltas (written by main's GLFW callbacks, consumed by Camera::mousemove)
+extern GLfloat offset_x;
+extern GLfloat offset_y;
+extern float scale;
+
 class Camera {
 private:
 

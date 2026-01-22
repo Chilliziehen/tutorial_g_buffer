@@ -14,8 +14,10 @@ static const glm::vec3 defaultPosition = glm::vec3(0.0f, 0.0f, 3.0f);
 static const glm::vec3 defaultLook = glm::vec3(0.0f, 0.0f, 0.0f);
 static const GLfloat defaultSpeed = 0.05f;
 
-GLfloat offset_x = 0.0f;
-GLfloat offset_y = 0.0f;
+// Mouse deltas are defined in the main translation unit (e.g., g_buffer_rendering.cpp)
+extern GLfloat offset_x;
+extern GLfloat offset_y;
+extern float scale;
 
 Camera::Camera()
 {
