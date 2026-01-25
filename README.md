@@ -5,8 +5,6 @@
 - `tutorial_g_buffer`：G-Buffer / Deferred 相关示例
 - `cxx_library`：场景/资源导入（Assimp）等通用库
 
-> 本文档严格遵循当前仓库的工程结构与 CMake 约定（包含 `configure_file()` 生成 `config.h` 的方式），不会引入你工程里没有的“自定义资源路径写死”的改法。
-
 ---
 
 ## 1. 目录结构（和你需要关心的部分）
@@ -50,11 +48,9 @@
 - `libs/external/glfw/include` + `libs/external/glfw/lib-vc2022/*.lib`
 - `libs/external/glew/include` + `libs/external/glew/lib/*.lib`
 - `libs/external/glm/`（header-only）
-- `libs/external/tinyobj/`（header-only 或按你现有结构）
+- `libs/external/tinyobj/`（header-only）
 - `libs/stb/stb_image/`
 - `libs/external/assimp/include` + `libs/external/assimp/lib/*.lib` + `libs/external/assimp/bin/*.dll`
-
-由于你的 `.gitignore` 忽略了 `/libs/`，所以这些内容不会随仓库提交。
 
 ---
 
