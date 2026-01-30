@@ -60,6 +60,7 @@ target_include_directories(forward_rendering PRIVATE
 target_link_libraries(
         forward_rendering PRIVATE
         cxx_library
+        ${LINK_LIBS}
 )
 
 add_executable(tutorial_g_buffer g_buffer_rendering.cpp
@@ -77,10 +78,19 @@ target_link_libraries(
         cxx_library
         ${LINK_LIBS}
 )
+
 target_compile_definitions(tutorial_g_buffer PRIVATE GLEW_STATIC)
+target_compile_definitions(forward_rendering PRIVATE GLEW_STATIC)
+
 add_custom_command(TARGET tutorial_g_buffer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "D:/Repositories/ComputerGraphics/tutorial_g_buffer/libs/external/assimp/bin/assimp-vc143-mtd.dll"
+        ${ASSIMP_DIR}/bin/assimp-vc143-mtd.dll
         "$<TARGET_FILE_DIR:tutorial_g_buffer>"
+)
+
+add_custom_command(TARGET tutorial_g_buffer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${ASSIMP_DIR}/bin/assimp-vc143-mtd.dll
+        "$<TARGET_FILE_DIR:forward_rendering>"
 )
 
